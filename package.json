@@ -1,0 +1,14 @@
+{
+  "name": "todo-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Joseph Harvey Angeles <josephharveyangeles@gmail.com> (http://josephharveyangeles.com)",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^3.1.3"
+  }
+}
