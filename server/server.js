@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const {ObjectID} = require('mongodb');
 
 const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todo');
@@ -8,6 +9,10 @@ const {User} = require('./models/user');
 const PORT = process.env.PORT || 3000;
 
 const app = express();
+
+const isValidId = (id) => {
+  return ObjectID.isValid(id);
+}
 
 app.use(bodyParser.json());
 
@@ -29,8 +34,7 @@ app.get('/todos', (req, res) => {
 
 app.get('/todos/:id', (req, res) => {
   let id = req.params.id;
-  const validId = require('mongodb').ObjectID.isValid(id);
-  if (!validId) {
+  if (!isValidId(id)) {
     return res.status(400).send({error: 'Invalid id'});
   }
 
@@ -42,6 +46,20 @@ app.get('/todos/:id', (req, res) => {
   }).catch(e => res.status(400).send({}));
 
 });
+
+app.delete('/todos/:id', (req, res) => {
+  const id = req.params.id;
+  if (!isValidId(id)) {
+    return res.status(400).send();
+  }
+  Todo.findByIdAndRemove(id).then(doc => {
+    if (!doc) {
+      return res.status(400).send();
+    }
+    res.status(200).send({todo: doc});
+  }).catch(e => res.status(400).send());
+  
+})
 
 app.listen(PORT, () => {
   console.log(`Started on port ${PORT}`);
