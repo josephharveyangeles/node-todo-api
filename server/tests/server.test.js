@@ -25,7 +25,7 @@ describe('POST /todos', () => {
       .send({text})
       .expect(200)
       .expect(res => {
-        expect(res.body.text).toBe(text);
+        expect(res.body.todo.text).toBe(text);
       })
       .end((err, res) => { // End block for testing internal state after the endpoint was called, as opposed to expect(res) where you test the actual response. The effect are both the same but it seems like it's more semantically correct to use end() for non-response related assertions.
         if (err) {
