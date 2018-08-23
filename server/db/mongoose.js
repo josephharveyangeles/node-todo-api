@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 mongoose.set('useFindAndModify', false)
-const DB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/TodoApp';
-mongoose.connect(DB_URI, {useNewUrlParser: true});
+mongoose.connect(process.env.MONGODB_URI, {useNewUrlParser: true});
 
 module.exports = {mongoose}
