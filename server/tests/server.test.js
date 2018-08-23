@@ -6,7 +6,7 @@ const {Todo} = require('./../models/todo');
 
 const todos = [
   { _id: new ObjectID(), text: 'Fist test todo' },
-  { _id: new ObjectID(), text: 'Second test todo' }
+  { _id: new ObjectID(), text: 'Second test todo', completed: true, completedAt: 333 }
 ]
 
 beforeEach(done => {
@@ -137,3 +137,34 @@ describe('DELETE /todos/:id', () => {
   });
 
 });
+
+describe('PATCH /todos/:id', () => {
+  it('should update the todo', done => {
+    const hexId = todos[0]._id.toHexString();
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send({completed: true})
+      .expect(200)
+      .expect(res => {
+        expect(res.body.todo.completed).toBeTruthy();
+        expect(typeof res.body.todo.completedAt).toBe('number'); // expect has been changed from v21+
+      })
+      .end(done)
+  });
+
+  it('should clear completedAt when todo is not completed', done => {
+    const hexId = todos[1]._id.toHexString();
+    const text = 'updated'
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send({text, completed: false})
+      .expect(200)
+      .expect(res => {
+        const {todo} = res.body;
+        expect(todo.completed).toBeFalsy();
+        expect(todo.text).toBe(text);
+        expect(todo.completedAt).toBeNull();
+      })
+      .end(done);
+  });
+})
