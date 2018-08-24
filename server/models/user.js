@@ -1,4 +1,6 @@
 const _ = require('lodash')
+const bcrypt = require('bcryptjs');
+
 const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
@@ -59,6 +61,19 @@ UserSchema.statics.findByToken = function (token) {
   });
 
 };
+// mongoose middleware
+UserSchema.pre('save', function(next) {
+  const user = this;
+  if (!user.isModified('password')) {
+    next();
+  }
+  console.log('hashing the password')
+  bcrypt.genSalt(10)
+        .then(salt => bcrypt.hash(user.password, salt))
+        .then(hash => user.password = hash)
+        .then(() => next())
+        .catch(e => next(e))
+})
 
 // mongoose will create a collection named, 'users' by default.
 const User = mongoose.model('User', UserSchema);
