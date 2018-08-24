@@ -42,6 +42,24 @@ UserSchema.methods.generateAuthToken = function () {
   return this.save().then(() => token); // implicit return, returning a value on a promise will pass that value as the result of the next then call, as oppose to returning a promise which will be the next thenable.
 };
 
+UserSchema.statics.findByToken = function (token) {
+  const User = this;
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, 'abc123');
+  } catch(e) {
+    return Promise.reject();
+  }
+
+  return User.findOne({
+    '_id': decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
+  });
+
+};
+
 // mongoose will create a collection named, 'users' by default.
 const User = mongoose.model('User', UserSchema);
 
