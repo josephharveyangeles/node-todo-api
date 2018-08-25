@@ -88,6 +88,7 @@ app.patch('/todos/:id', (req, res) => {
 
 });
 
+// Sign Up
 app.post('/users', (req, res) => {
   const body = _.pick(req.body, ['email', 'password']);
   const user = new User(body);
@@ -98,9 +99,22 @@ app.post('/users', (req, res) => {
       .catch(e => res.status(400).send(e));
 })
 
+// User profile
 app.get('/users/me', authenticate, (req, res) => {
   res.send(req.user);
 })
+
+// LOGIN
+app.post('/users/login', async (req, res) => {
+  const body = _.pick(req.body, ['email', 'password']);
+  try {
+    const user = await User.findByCredentials(body);
+    const token = await user.generateAuthToken();
+    res.header('x-auth', token).send(user);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Started on port ${PORT}`);

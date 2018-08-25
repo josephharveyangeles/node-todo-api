@@ -61,6 +61,22 @@ UserSchema.statics.findByToken = function (token) {
   });
 
 };
+
+UserSchema.statics.findByCredentials = async function({email, password}) {
+  const User = this;
+  // let userFound;
+  const user = await User.findOne({email});
+
+  if (!user) {
+    return Promise.reject('User does not exist');
+  }
+
+  const isMatched = await bcrypt.compare(password, user.password);
+  if (isMatched) {
+    return user;
+  }
+  return Promise.reject('Invalid password.');
+}
 // mongoose middleware
 UserSchema.pre('save', function(next) {
   const user = this;
