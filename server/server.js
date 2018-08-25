@@ -5,7 +5,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
 
-const {mongoose} = require('./db/mongoose'); // even though, this wasn't used, commenting this out will break stuff because the db initilization wasn't run. Should refactor this
+const {mongoose} = require('./db/mongoose'); // even though, this wasn't used, commenting this out will break stuff because the db initialization wasn't run. Should refactor this
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
 const {authenticate} = require('./middleware/authenticate');
