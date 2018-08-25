@@ -102,7 +102,7 @@ app.post('/users', (req, res) => {
 // User profile
 app.get('/users/me', authenticate, (req, res) => {
   res.send(req.user);
-})
+});
 
 // LOGIN
 app.post('/users/login', async (req, res) => {
@@ -114,6 +114,12 @@ app.post('/users/login', async (req, res) => {
   } catch (err) {
     res.status(400).send(err);
   }
+});
+
+app.delete('/users/me/token', authenticate, (req, res) => {
+  req.user.removeToken(req.token)
+    .then(() => res.status(200).send())
+    .catch(() => res.status(400).send());
 });
 
 app.listen(PORT, () => {

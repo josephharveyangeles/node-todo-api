@@ -44,6 +44,15 @@ UserSchema.methods.generateAuthToken = function () {
   return this.save().then(() => token); // implicit return, returning a value on a promise will pass that value as the result of the next then call, as oppose to returning a promise which will be the next thenable.
 };
 
+UserSchema.methods.removeToken = function (token) {
+  var user = this;
+  return user.update({
+    $pull: { // will remove the elment that has the follwing 'token'
+      tokens: { token }
+    }
+  })
+};
+
 UserSchema.statics.findByToken = function (token) {
   const User = this;
 
