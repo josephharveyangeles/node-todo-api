@@ -36,12 +36,18 @@ UserSchema.methods.toJSON = function () {
 
 // using arrow function here will bind 'this' to 'UserSchema.methods'
 UserSchema.methods.generateAuthToken = function () {
-  // let user = this;
+  let user = this;
+  console.log('generating auth token')
   const access = 'auth';
-  const token = jwt.sign({_id: this._id.toHexString(), access}, process.env.JWT_SECRET).toString();
-  this.tokens.push({access, token});
-  
-  return this.save().then(() => token); // implicit return, returning a value on a promise will pass that value as the result of the next then call, as oppose to returning a promise which will be the next thenable.
+  try {
+    const token = jwt.sign({_id: user._id.toHexString(), access}, process.env.JWT_SECRET).toString();
+    console.log('this is the token: ',token);
+    user.tokens.push({access, token});
+    console.log('while these are the current tokens:', user.tokens)
+  } catch (e) {
+    console.log('error due to: ', e.message);
+  }
+  return user.save().then(() => token); // implicit return, returning a value on a promise will pass that value as the result of the next then call, as oppose to returning a promise which will be the next thenable.
 };
 
 UserSchema.methods.removeToken = function (token) {
