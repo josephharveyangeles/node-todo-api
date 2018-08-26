@@ -39,7 +39,7 @@ UserSchema.methods.generateAuthToken = function () {
   // let user = this;
   const access = 'auth';
   const token = jwt.sign({_id: this._id.toHexString(), access}, process.env.JWT_SECRET).toString();
-  this.tokens = this.tokens.concat([{access, token}]);
+  this.tokens.push({access, token});
   
   return this.save().then(() => token); // implicit return, returning a value on a promise will pass that value as the result of the next then call, as oppose to returning a promise which will be the next thenable.
 };
