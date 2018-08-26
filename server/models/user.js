@@ -37,16 +37,9 @@ UserSchema.methods.toJSON = function () {
 // using arrow function here will bind 'this' to 'UserSchema.methods'
 UserSchema.methods.generateAuthToken = function () {
   let user = this;
-  console.log('generating auth token')
   const access = 'auth';
-  try {
-    const token = jwt.sign({_id: user._id.toHexString(), access}, process.env.JWT_SECRET).toString();
-    console.log('this is the token: ',token);
-    user.tokens.push({access, token});
-    console.log('while these are the current tokens:', user.tokens)
-  } catch (e) {
-    console.log('error due to: ', e.message);
-  }
+  const token = jwt.sign({_id: user._id.toHexString(), access}, process.env.JWT_SECRET).toString();
+  user.tokens.push({access, token});
   return user.save().then(() => token); // implicit return, returning a value on a promise will pass that value as the result of the next then call, as oppose to returning a promise which will be the next thenable.
 };
 
