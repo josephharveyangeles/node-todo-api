@@ -20,9 +20,11 @@ const isValidId = (id) => {
 
 app.use(bodyParser.json());
 
-app.post('/todos', (req, res) => {
+// Add a  todos
+app.post('/todos', authenticate, (req, res) => {
   const todo = new Todo({
-    text: req.body.text
+    text: req.body.text,
+    _creator: req.user._id
   });
 
   todo.save()
@@ -30,19 +32,25 @@ app.post('/todos', (req, res) => {
       .catch(e => res.status(400).send(e));
 })
 
-app.get('/todos', (req, res) => {
-  Todo.find({})
+// Get todos
+app.get('/todos', authenticate, (req, res) => {
+  Todo.find({_creator: req.user._id})
     .then(todos => res.send({todos}))
     .catch(e => res.status(400).send(e));
 });
 
-app.get('/todos/:id', (req, res) => {
+
+// Get a single todo via id
+app.get('/todos/:id', authenticate, (req, res) => {
   const id = req.params.id;
   if (!isValidId(id)) {
     return res.status(400).send({error: 'Invalid id'});
   }
 
-  Todo.findById(id).then(todo => {
+  Todo.findOne({
+    _id: id,
+    _creator: req.user._id
+  }).then(todo => {
     if (!todo) {
       return res.status(400).send({});
     }
@@ -51,12 +59,15 @@ app.get('/todos/:id', (req, res) => {
 
 });
 
-app.delete('/todos/:id', (req, res) => {
+app.delete('/todos/:id', authenticate, (req, res) => {
   const id = req.params.id;
   if (!isValidId(id)) {
     return res.status(400).send();
   }
-  Todo.findByIdAndRemove(id).then(todo => {
+  Todo.findOneAndRemove({
+    _id: id,
+    _creator: req.user._id
+  }).then(todo => {
     if (!todo) {
       return res.status(400).send();
     }
@@ -64,7 +75,9 @@ app.delete('/todos/:id', (req, res) => {
   }).catch(e => res.status(400).send());
 });
 
-app.patch('/todos/:id', (req, res) => {
+
+// Update a specific todo
+app.patch('/todos/:id', authenticate, (req, res) => {
   const id = req.params.id;
   if (!isValidId(id)) {
     return res.status(400).send();
@@ -77,7 +90,10 @@ app.patch('/todos/:id', (req, res) => {
     body.completedAt = null;
   }
   
-  Todo.findByIdAndUpdate(id, {$set: body}, {new: true})
+  Todo.findOneAndUpdate({
+      _id: id,
+      _creator: req.user._id
+    }, {$set: body}, {new: true})
       .then(todo => {
         if (!todo) {
           return Promise.reject();
